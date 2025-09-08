@@ -4,7 +4,7 @@ import Search from "@/components/Search";
 import config from "@/constants";
 import React, { useEffect, useCallback } from "react";
 import { useInView } from "react-intersection-observer";
-
+import {LoaderCircle} from 'lucide-react'
 export default function Home() {
   // State management
   const [page, setPage] = React.useState(1);
@@ -141,7 +141,7 @@ export default function Home() {
           <div ref={ref} className="flex justify-center mt-8 h-20">
             {isLoading ? (
               <div className="text-white flex items-center gap-2">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                <LoaderCircle className="animate-spin" />
                 Loading more movies...
               </div>
             ) : (
@@ -171,7 +171,7 @@ export default function Home() {
         {isLoading && movies.length === 0 && (
           <div className="flex justify-center items-center mt-8">
             <div className="text-white flex items-center gap-2">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+              <LoaderCircle className="animate-spin" />
               Loading movies...
             </div>
           </div>

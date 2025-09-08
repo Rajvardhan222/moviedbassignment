@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Movie DB
+This project uses TMDB API for fetching and listing movies.
 
-## Getting Started
+## Following are the features offer by this application
+   - Get a list of most popular movies on home page.
+   - Search a movies.
+   - Click on a movie listed to get more detail about it.
 
-First, run the development server:
+## Stack and API used
+Next.js and TMDB API
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## steps to develop this app on your machine
+- first get the api key from [here](https://www.themoviedb.org/settings/api)
+ - clone this repo to your machine
+- run `npm install`
+ - change to the project directory
+ - create a file `.env` in the root of the project
+ - fill it with this data and add your api key which you previously got from above link.
+    ```js
+    TMDB_API_KEY=Enter your api key
+    
+    NEXT_PUBLIC_TMDB_BASE_URL=https://api.themoviedb.org/3
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    ```
+ - run `npm run dev` to start the dev server
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+ ## Project Structure
+    src
+        |--->app
+                |--->page.tsx (root of the application)
+                |--->[movieId]
+                              |--->page.tsx (display Individual movie detail)
+            |---> api
+                    |--->trending
+                                 |---> route.ts (contain get route to fetch most trending movies)
+                    |--->search
+                               |--->route.ts (contain route for fetching the search result)
+                    |--->[movieId]
+                                  |---> route.ts (contain routes fetching detail for individual movies)
+ 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Features
+ - The search result uses a debounce search so we dont flood the backend with many request and call it after 500ms
+ - I have also implemented infinity Scroll using observer API which allow user to scroll endlessly.
+ - User get the details of the movie with a poster picture and some key details and facts about it.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+ This project was created as a part of assignment from `Trinity Packaging Co. Pvt. Ltd` by Rajvardhan Ranawat
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+            
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -2,7 +2,7 @@
 import config from '@/constants'
 import Image from 'next/image'
 import React, { useEffect } from 'react'
-
+import {LoaderCircle} from 'lucide-react'
 
 const realTMDBdATA = {
   "adult": false,
@@ -110,18 +110,20 @@ const tempDataAboutMovieUpFromImdb = {
     "Website": "http://disney.go.com/disneyvideos/animatedfilms/up/",
     "Response": "True"
 }
-function Page({params}) {
+ function Page({params}) {
   // TMDB image base URL for posters (w500 is a good size for responsive design)
   const [movieData, setMovieData] = React.useState(null);
   const tmdbImageBaseUrl = "https://image.tmdb.org/t/p/w500";
   const posterUrl = movieData?.poster_path ? `${tmdbImageBaseUrl}${movieData.poster_path}` : config.imageUrl;
+  const [loading,setIsLoading] = React.useState(true);
 
   // Convert vote_average to 5-star scale (TMDB uses 10-point scale)
   const starRating = Math.round(movieData?.vote_average / 2);
 
-  let movieId = params.movieId
+  let movieId =  params.movieId
 
   const fetchMovieDetails = async () => {
+    if(!movieId) return;
     const response = await fetch(`/api/movies/${movieId}`);
     const data = await response.json();
     return data;
@@ -132,10 +134,20 @@ function Page({params}) {
     fetchMovieDetails().then(data => {
       console.log('Fetched movie details:', data);
         setMovieData(data);
+    }).finally(()=> {
+        setIsLoading(false);
     });
   }, [movieId]);
+
+  if(loading){
+    return <div className='w-full min-h-screen m-auto flex items-center justify-center text-4xl font-semibold'>
+        <LoaderCircle className="animate-spin w-16 h-16 sm:w-20 sm:h-20 md:w-36 md:h-36 lg:w-40 lg:h-40" />
+    </div>
+  }
   return (
-   movieData && <div className='w-full h-full flex flex-col gap-y-7 px-4 md:px-0'>
+   movieData && <div className={`w-full h-full flex flex-col gap-y-7 px-4 transition-opacity duration-500 ease-in-out md:px-10 ${
+        !loading ? 'opacity-100' : 'opacity-0'
+      }`}>
         <Image 
           className='rounded-3xl m-auto w-full max-w-2xl object-cover' 
           src={posterUrl}  
@@ -217,6 +229,7 @@ function Page({params}) {
                   {company.logo_path && (
                     <Image 
                       src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
+                      color='white'
                       alt={company.name}
                       width={80}
                       height={40}
