@@ -1,6 +1,7 @@
+'use client'
 import config from '@/constants'
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 
 const realTMDBdATA = {
@@ -109,36 +110,52 @@ const tempDataAboutMovieUpFromImdb = {
     "Website": "http://disney.go.com/disneyvideos/animatedfilms/up/",
     "Response": "True"
 }
-function Page() {
+function Page({params}) {
   // TMDB image base URL for posters (w500 is a good size for responsive design)
+  const [movieData, setMovieData] = React.useState(null);
   const tmdbImageBaseUrl = "https://image.tmdb.org/t/p/w500";
-  const posterUrl = realTMDBdATA.poster_path ? `${tmdbImageBaseUrl}${realTMDBdATA.poster_path}` : config.imageUrl;
-  
+  const posterUrl = movieData?.poster_path ? `${tmdbImageBaseUrl}${movieData.poster_path}` : config.imageUrl;
+
   // Convert vote_average to 5-star scale (TMDB uses 10-point scale)
-  const starRating = Math.round(realTMDBdATA.vote_average / 2);
-  
+  const starRating = Math.round(movieData?.vote_average / 2);
+
+  let movieId = params.movieId
+
+  const fetchMovieDetails = async () => {
+    const response = await fetch(`/api/movies/${movieId}`);
+    const data = await response.json();
+    return data;
+  };
+
+
+  useEffect(() => {
+    fetchMovieDetails().then(data => {
+      console.log('Fetched movie details:', data);
+        setMovieData(data);
+    });
+  }, [movieId]);
   return (
-    <div className='w-full h-full flex flex-col gap-y-7 px-4 md:px-0'>
+   movieData && <div className='w-full h-full flex flex-col gap-y-7 px-4 md:px-0'>
         <Image 
           className='rounded-3xl m-auto w-full max-w-2xl object-cover' 
           src={posterUrl}  
           width={500} 
           height={750}
-          alt={realTMDBdATA.title}
+          alt={movieData.title}
         />
 
-        <h1 className='text-2xl md:text-3xl font-bold text-center md:text-left'>{realTMDBdATA.title}</h1>
+        <h1 className='text-2xl md:text-3xl font-bold text-center md:text-left'>{movieData.title}</h1>
 
         {/* Tagline */}
-        <p className='text-lg md:text-xl italic text-center md:text-left opacity-75'>"{realTMDBdATA.tagline}"</p>
+        <p className='text-lg md:text-xl italic text-center md:text-left opacity-75'>"{movieData.tagline}"</p>
 
         {/* Overview */}
-        <p className='text-sm md:text-base leading-relaxed text-gray-300'>{realTMDBdATA.overview}</p>
+        <p className='text-sm md:text-base leading-relaxed text-gray-300'>{movieData.overview}</p>
 
         {/* Genres */}
        <div className='flex flex-wrap gap-2'>
          {
-            realTMDBdATA.genres.map((genre) => (
+            movieData.genres.map((genre) => (
                 <span key={genre.id} className='text-white opacity-50 text-sm md:text-base px-2 py-1 bg-gray-800 rounded-lg'>
                   {genre.name}
                 </span>
@@ -156,46 +173,46 @@ function Page() {
                     </span>
                 ))}
                </div>
-                <span className='text-white ml-2 text-sm md:text-base'>{realTMDBdATA.vote_count.toLocaleString()} votes</span>
+                <span className='text-white ml-2 text-sm md:text-base'>{movieData.vote_count.toLocaleString()} votes</span>
             </div>
             
             <div className='flex items-center justify-between'>
                 <p className='text-white opacity-50 text-sm md:text-base'>TMDB Rating</p>
-                <p className='text-sm md:text-base'>{realTMDBdATA.vote_average.toFixed(1)}/10</p>
+                <p className='text-sm md:text-base'>{movieData.vote_average.toFixed(1)}/10</p>
             </div>
 
             <div className='flex items-center justify-between'>
                 <p className='text-white opacity-50 text-sm md:text-base'>Release Date</p>
-                <p className='text-sm md:text-base'>{new Date(realTMDBdATA.release_date).toLocaleDateString()}</p>
+                <p className='text-sm md:text-base'>{new Date(movieData.release_date).toLocaleDateString()}</p>
             </div>
 
             <div className='flex items-center justify-between'>
                 <p className='text-white opacity-50 text-sm md:text-base'>Runtime</p>
-                <p className='text-sm md:text-base'>{realTMDBdATA.runtime} minutes</p>
+                <p className='text-sm md:text-base'>{movieData.runtime} minutes</p>
             </div>
 
             <div className='flex items-center justify-between'>
                 <p className='text-white opacity-50 text-sm md:text-base'>Budget</p>
-                <p className='text-sm md:text-base'>${realTMDBdATA.budget.toLocaleString()}</p>
+                <p className='text-sm md:text-base'>${movieData.budget.toLocaleString()}</p>
             </div>
 
             <div className='flex items-center justify-between'>
                 <p className='text-white opacity-50 text-sm md:text-base'>Revenue</p>
-                <p className='text-sm md:text-base'>${realTMDBdATA.revenue.toLocaleString()}</p>
+                <p className='text-sm md:text-base'>${movieData.revenue.toLocaleString()}</p>
             </div>
 
             <div className='flex items-center justify-between'>
                 <p className='text-white opacity-50 text-sm md:text-base'>Status</p>
-                <p className='text-sm md:text-base'>{realTMDBdATA.status}</p>
+                <p className='text-sm md:text-base'>{movieData.status}</p>
             </div>
         </div>
 
         {/* Production Companies */}
-        {realTMDBdATA.production_companies.length > 0 && (
+        {movieData.production_companies.length > 0 && (
           <div className='flex flex-col gap-y-3'>
             <h3 className='text-lg md:text-xl font-semibold'>Production Companies</h3>
             <div className='flex flex-wrap gap-3'>
-              {realTMDBdATA.production_companies.map((company) => (
+              {movieData.production_companies.map((company) => (
                 <div key={company.id} className='bg-gray-800 rounded-lg p-3 flex flex-col items-center text-center'>
                   {company.logo_path && (
                     <Image 
